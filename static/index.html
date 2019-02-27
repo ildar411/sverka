@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+  <div class='a1'>
+    <form  id='add' method="POST">
+      <select  id='couriers' placeholder='выберите курьера' class='select'>
+      </select>
+      <br>
+      <input  type='number' id='sum' class='sum'>
+      <br><br>
+      <input type='submit'  id='button'>
+    </form>
+  </div>
+  <div class='b2'>
+    <form id='sort' method='GET'>
+      <input placeholder="от" type='date' id='start'>
+      <br><br>
+      <input  placeholder="до" type='date' id='end'>
+      <br><br>
+      <input type="submit" value='ok'  id='time'>
+    </form>
+     <ul id='list'>
+    </ul>
+  </div>
+  <script src ="/script.js"></script>
+</body>
+</html>
+
+

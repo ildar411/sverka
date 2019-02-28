@@ -3,7 +3,7 @@ const bodyParsser = require('body-parser');
 var mysql = require('mysql');
 
 const app = express();
-var con = mysql.createPool({
+var pool = mysql.createPool({
 	connectionLimit : 100,
 	host : 'localhost',
 	user : 'test',
@@ -19,24 +19,30 @@ app.use(bodyParsser.json());
 app.post('/couriers', function(req, res){
 	var name = req.body.name;
 	var sum = req.body.sum;
-	con.getConnection(function(err, conn) {
+	pool.getConnection(function(err, conn) {
   		if (err) {
   			res.status(500);
   			res.json({
   				error: err.toString()
   			})
   			}
-  		else {
+  		else 
+  		{
   			conn.query(mysql.format('select id from couriers where name=?', [name]), function(err, rows){
-  				if (err) {console.log('ошибка mysql');}
+  				if(err) 
+  				{
+  					console.log('ошибка mysql');
+  				}
   				else 
   			    {
   			    	console.log('success');
   				};
-  				var couriers_Id = rows.id;
+  				console.log('!!!!!!!!!');
+  				//console.log(rows);
+  				var couriers_Id = rows[0].id;
   			
   				conn.query(mysql.format('insert into couriers_transfers (date, time, sum, couriers_id) values (curdate(), curtime(), ?, ?)',
-  				[sum, rows.id]), function(err, data){
+  				[sum, couriers_Id]), function(err, data){
                 	if (err) {console.log('ошибка mysql');}
   					else {console.log('success');};
   				
@@ -56,18 +62,31 @@ app.post('/couriers', function(req, res){
 app.get('/api2', function(req,res){
 	var start = req.body.start;
 	var end = req.body.end;
-	con.getConnection(function(err, conn){
-		if (err) {
+	pool.getConnection(function(err, conn){
+		if (err) 
+		{
   			res.status(500);
   			res.json({
   				error: err.toString()
-  			})
+  			});
   			}
-  		else {
-  			conn.query(mysql.format('select (date, time, sum, couriers_id) from couriers_transfers where (date > ?)and(date < ?)', [start, end]), function(err, rows){
-  				if (err) {console.log('ошибка mysql');}
-  				else {console.log('success');};
+  		else 
+  		{
+  			var start = req.body.start;
+			var end = req.body.end;
+  			conn.query(mysql.format('select * from couriers_transfers where (date > ?)and(date < ?)', [start, end]), function(err, rows){
+  				if (err) 
+  				{	
+  					console.log('ошибка mysql');
+    			}
+  				else 
+  				{
+  					console.log('success');
+
+  				};
   				var couriers_id = rows.couriers_id;
+  				console.log('!!!!!');
+  				console.log(rows);
   				var date = rows.date;
   				var time = rows.time;
   				var sum = rows.sum;
@@ -88,7 +107,7 @@ app.get('/api2', function(req,res){
 });
 });
 app.get('/api1', function(req, res){
-	con.getConnection(function(err, conn){
+	pool.getConnection(function(err, conn){
 		if(err){
 			res.status(500);
 			res.json({
@@ -99,6 +118,8 @@ app.get('/api1', function(req, res){
 			conn.query(mysql.format('select (name) from couriers'), function(err, rows){
 				if (err) {console.log('ошибка mysql');}
 				else {console.log('success');};
+				console.log('!!!!!!');
+				console.log(rows);
 				res.json({
 					name : rows
 				});

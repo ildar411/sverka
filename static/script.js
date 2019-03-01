@@ -49,7 +49,7 @@ $(document).ready(function(){
 					'end' : end},
 				success: function(res){
 					var newLi = document.createElement('li');
-  					newLi.innerHTML = '<p>Имя: ' + res.name + ' Сумма: ' + res.sum + ' Дата: ' + res.date + ' Время: ' + res.time + '</p>';
+  					newLi.innerHTML = '<p>Имя: ' + res.rows.name + ' Сумма: ' + res.rows.sum + ' Дата: ' + res.rows.date + ' Время: ' + res.rows.time + '</p>';
 					list.appendChild(newLi);
 					
 		

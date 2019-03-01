@@ -84,24 +84,49 @@ app.get('/api2', function(req,res){
   					console.log('success');
 
   				};
-  				var couriers_id = rows.couriers_id;
+  				var dat = rows;
   				console.log('!!!!!');
   				console.log(rows);
-  				var date = rows.date;
-  				var time = rows.time;
-  				var sum = rows.sum;
-  				conn.query(mysql.format('select (name) from couriers where (id = ?)', [couriers_id]), function(err, rows){
-  					if(err) {console.log('ошибка mysql');}
-  					else {console.log('success');};
-  							res.json({
-		  						data : {sum : sum,
-		  							date : date,
-		  							time : time,
-		  							name : rows.name}
-		  					});
+  				var names = [];
+  				let myPromise = new Promise(function(resolve, reject){
+  					for (var i = 0; i < rows.length; i++) {
+   						conn.query(mysql.format('select (name) from couriers where (id = ?)', [dat[i].couriers_id]), function(err, rows){
+  							if(err) 
+  							{
+  								console.log('ошибка mysql');
+  								reject(error);
+  							}
+  							else 
+  							{
+  								console.log('success');
+  								resolve('success');
+  							};
+  							names[i] = rows[0].name;
+  							console.log('!!!!!!');
+  							console.log(names);
+
+  						})
+  					};
+  					
+  				});
+  				var fun = function() {
+  					myPromise.then(function(){
+  						console.log('!!!!!!!!!!!!');
+  						console.log(names);
+  						res.json({
+		  					data : dat,
+		  					name : names
+		  						});
+  					});
+  					myPromise.catch(function(){
+  						console.log('err of promise');		
+  					});
   					conn.release();
+  				};
+  				fun();
+
   				});
-  				});
+  			
 
  };
 });

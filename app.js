@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParsser = require('body-parser');
 var mysql = require('mysql');
+const moment = require('moment');
 
 const app = express();
 var pool = mysql.createPool({
@@ -38,7 +39,7 @@ app.post('/couriers', function(req, res){
   			    	console.log('success');
   				};
   				console.log('!!!!!!!!!');
-  				//console.log(rows);
+  				console.log(rows);
   				var couriers_Id = rows[0].id;
   			
   				conn.query(mysql.format('insert into couriers_transfers (date, time, sum, couriers_id) values (curdate(), curtime(), ?, ?)',
@@ -59,9 +60,7 @@ app.post('/couriers', function(req, res){
 	});
 });
 
-app.get('/api2', function(req,res){
-	var start = req.body.start;
-	var end = req.body.end;
+app.get('/api2?', function(req,res){
 	pool.getConnection(function(err, conn){
 		if (err) 
 		{
@@ -72,8 +71,8 @@ app.get('/api2', function(req,res){
   			}
   		else 
   		{
-  			var start = req.body.start;
-			var end = req.body.end;
+  			var start = req.query.start;
+			var end = req.query.end;
   			conn.query(mysql.format('select * from couriers_transfers where (date > ?)and(date < ?)', [start, end]), function(err, rows){
   				if (err) 
   				{	
@@ -84,46 +83,55 @@ app.get('/api2', function(req,res){
   					console.log('success');
 
   				};
-  				var dat = rows;
+  				var dat = rows.map(r => ({...r, date: moment(r.date).format('YYYY-MM-DD')}));
   				console.log('!!!!!');
   				console.log(rows);
   				var names = [];
+
+  				var promises = [];
   				let myPromise = new Promise(function(resolve, reject){
   					for (var i = 0; i < rows.length; i++) {
-   						conn.query(mysql.format('select (name) from couriers where (id = ?)', [dat[i].couriers_id]), function(err, rows){
-  							if(err) 
-  							{
-  								console.log('ошибка mysql');
-  								reject(error);
-  							}
-  							else 
-  							{
-  								console.log('success');
-  								resolve('success');
-  							};
-  							names[i] = rows[0].name;
-  							console.log('!!!!!!');
-  							console.log(names);
+  						let aPromise = new Promise(function(resolve, reject){	
+   							conn.query(mysql.format('select (name) from couriers where id=?', [dat[i].couriers_id]), function(err, rows){
+  								if(err) 
+  								{
+  									reject(err);
+	  								return;
+	  							};
+	  							/*
+	  							if(rows[0].name){
+	  								names.push(rows[0].name);
+	  								console.log('!!!!!!');
+	  								console.log(names);
+	  							};
+	  							*/
+	  							resolve(rows[0].name);
 
-  						})
+	  						})
+   						})
+  						promises.push(aPromise);
   					};
-  					
+  					Promise.all(promises).then(function(results){
+  						conn.release();
+  						resolve(results);
+  					})
   				});
-  				var fun = function() {
-  					myPromise.then(function(){
+  				var fan = function(){
+  					myPromise.then(function(resolve){
   						console.log('!!!!!!!!!!!!');
-  						console.log(names);
+  						console.log(resolve);
   						res.json({
 		  					data : dat,
-		  					name : names
-		  						});
+		  					name : resolve
+		  					});
   					});
   					myPromise.catch(function(){
   						console.log('err of promise');		
   					});
-  					conn.release();
-  				};
-  				fun();
+  					};
+  					fan();
+ 
+  				
 
   				});
   			

@@ -11,21 +11,21 @@
 <body>
   <div class='a1'>
     <form  id='add' method="POST">
-      <select  id='couriers' placeholder='выберите курьера' class='select'>
+      <select  id='couriers' placeholder='выберите курьера' class='select' class='input-group' style='width: 25%'>
       </select>
-      <br>
-      <input  type='number' id='sum' class='sum'>
       <br><br>
-      <input type='submit'  id='button'>
+      <input  type='number' id='sum' class='sum' class='input-group'>
+      <br><br>
+      <input type='submit'  id='button' class='btn btn-primary'>
     </form>
   </div>
   <div class='b2'>
     <form id='sort' method='GET'>
-      <input placeholder="от" type='date' id='start'>
-      <br><br>
-      <input  placeholder="до" type='date' id='end'>
-      <br><br>
-      <input type="submit" value='ok'  id='time'>
+      <label>от</label>
+      <input  type='date' id='start' class='input-group' style="width: 25%">
+      <label>до</label>
+      <input   type='date' id='end' class='input-group' style='width: 25%'>
+      <input type="submit" value='ok'  id='time' class='btn btn-primary'>
     </form>
      <ul id='list'>
     </ul>
